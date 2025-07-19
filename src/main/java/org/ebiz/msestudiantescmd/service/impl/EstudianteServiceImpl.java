@@ -26,6 +26,14 @@ public class EstudianteServiceImpl implements EstudianteServiceInterface {
 
     @Override
     public Estudiante guardar(Estudiante estudiante) {
+        
+        // Validar código único
+        if (estudiante.getCodigo() != null) {
+            Optional<Estudiante> existePorCodigo = repo.findByCodigo(estudiante.getCodigo());
+            if (existePorCodigo.isPresent()) {
+                throw new RuntimeException("Código de estudiante ya se encuentra registrado");
+            }
+        }
 
         Optional<Estudiante> existePorNombreApellido = repo.findByNombreAndApellido(
                 estudiante.getNombre(),
@@ -51,7 +59,7 @@ public class EstudianteServiceImpl implements EstudianteServiceInterface {
 
     @Override
     public Estudiante obtenerPorId(Long id) {
-        return repo.findById(id).orElse(null);
+        return repo.findByIdAndHabilitado(id, 1).orElse(null);
     }
 
     @Override
@@ -60,8 +68,18 @@ public class EstudianteServiceImpl implements EstudianteServiceInterface {
         if (entidadActual == null) {
             throw new RuntimeException("Estudiante no encontrado");
         }
+        
+        // Validar código único si se está cambiando
+        if (estudiante.getCodigo() != null && !estudiante.getCodigo().equals(entidadActual.getCodigo())) {
+            Optional<Estudiante> existePorCodigo = repo.findByCodigo(estudiante.getCodigo());
+            if (existePorCodigo.isPresent()) {
+                throw new RuntimeException("Código de estudiante ya se encuentra registrado");
+            }
+        }
+        
         entidadActual.setNombre(estudiante.getNombre());
         entidadActual.setApellido(estudiante.getApellido());
+        entidadActual.setCodigo(estudiante.getCodigo());
         entidadActual.setCorreo(estudiante.getCorreo());
         entidadActual.setCarrera(estudiante.getCarrera());
         return repo.save(entidadActual);

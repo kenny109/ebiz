@@ -1,7 +1,6 @@
 package org.ebiz.msestudiantescmd.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,9 +8,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "t_estudiante", schema = "estudiantes")
@@ -30,7 +32,10 @@ public class Estudiante {
     @Column(name = "apellido")
     private String apellido;
 
-    @Column(name = "correo")
+    @Column(name = "codigo", unique = true)
+    private String codigo;
+
+    @Column(name = "correo", unique = true)
     private String correo;
 
     @Column(name = "carrera")
@@ -43,4 +48,7 @@ public class Estudiante {
     @JoinColumn(name = "id_aula")
     @JsonBackReference
     private Aula aula;
+
+    @OneToMany(mappedBy = "estudiante")
+    private List<Reserva> reservas;
 }
